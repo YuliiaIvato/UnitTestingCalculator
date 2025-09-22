@@ -272,7 +272,7 @@ namespace AnalaizerClassLibrary
         /// </summary> 
         /// <param name="c"></param>
         /// <returns> true - якщо, сивол э оператором, false - якщо сивол не э оператором </returns>        
-        private static bool IsOperator(string s)
+        public static bool IsOperator(string s)
         {
             if (s.Length == 1)
             {
@@ -289,7 +289,7 @@ namespace AnalaizerClassLibrary
         /// </summary>
         /// <param name="c"></param>
         /// <returns> true - символ є пробілом, інакше false</returns>        
-        private static bool IsDelimeter(char c)
+        public static bool IsDelimeter(char c)
         {
             return (c == ' ' ? true : false);
         }
