@@ -1,35 +1,114 @@
 ﻿using AnalaizerClassLibrary;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Data.SqlClient;
+using System.Configuration;
+
 
 namespace UnitTestProject1
 {
+    //[TestClass]
+    //public class AnalizerClassTest
+    //{
+    //    [TestMethod]
+    //    public void IsDelimeterTest()
+    //    {
+    //        //Arrange
+    //        char c = ' ';
+    //        bool expected = true;
+    //        //Actual
+    //        bool actual = AnalaizerClass.IsDelimeter(c);
+    //        //Assert
+    //        Assert.AreEqual(expected, actual);
+    //    }
+
+    //    [TestMethod]
+    //    public void IsOperatorTest()
+    //    {
+    //        //Arrange
+    //        string s = "+";
+    //        bool expected = true;
+    //        //Actual
+    //        bool actual = AnalaizerClass.IsOperator(s);
+    //        //Assert
+    //        Assert.AreEqual(expected, actual);
+    //    }
+
+    //    [TestMethod]
+    //    public void IsDelimeter_Test()
+    //    {
+    //        Assert.IsTrue(AnalaizerClass.IsDelimeter(' '));
+    //        Assert.IsFalse(AnalaizerClass.IsDelimeter('\t'));
+    //        Assert.IsFalse(AnalaizerClass.IsDelimeter('\n'));
+    //        Assert.IsFalse(AnalaizerClass.IsDelimeter('a'));
+    //        Assert.IsFalse(AnalaizerClass.IsDelimeter('+'));
+    //    }
+
+    //    [TestMethod]
+    //    public void IsOperator_Test()
+    //    {
+    //        string[] operators = { "+", "-", "*", "/", "(", ")"};
+    //        foreach (var op in operators)
+    //        {
+    //            Assert.IsTrue(AnalaizerClass.IsOperator(op));
+    //        }
+    //        string[] notOperators = { "a", "1", " "};
+    //        foreach (var notOp in notOperators)
+    //        {
+    //            Assert.IsFalse(AnalaizerClass.IsOperator(notOp));
+    //        }
+    //    }
+
+
+
+    //}
+
     [TestClass]
     public class AnalizerClassTest
     {
-        [TestMethod]
-        public void IsDelimeterTest()
-        {
-            //Arrange
-            char c = ' ';
-            bool expected = true;
-            //Actual
-            bool actual = AnalaizerClass.IsDelimeter(c);
-            //Assert
-            Assert.AreEqual(expected, actual);
-        }
+        private readonly string _connectionString = ConfigurationManager.ConnectionStrings["CalculatorDB"].ConnectionString;
 
         [TestMethod]
         public void IsOperatorTest()
         {
-            //Arrange
-            string s = "+";
-            bool expected = true;
-            //Actual
-            bool actual = AnalaizerClass.IsOperator(s);
-            //Assert
-            Assert.AreEqual(expected, actual);
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                conn.Open();
+                SqlCommand cmd = new SqlCommand("SELECT Symbol, Expected FROM Operators", conn);
+                SqlDataReader reader = cmd.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    string symbol = reader.GetString(0);      // беремо першу kолонkу 
+                    bool expected = reader.GetBoolean(1);     // беремо другу kолонkу, 0 -> false, 1 -> true
+
+                    bool actual = AnalaizerClass.IsOperator(symbol);
+
+                    Assert.AreEqual(expected, actual);
+                }
+            }
         }
 
+        [TestMethod]
+        public void IsDelimiterTest()
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                conn.Open();
+                SqlCommand cmd = new SqlCommand("SELECT Symbol, Expected FROM Delimiters", conn);
+                SqlDataReader reader = cmd.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    string symbol = reader.GetString(0);
+                    bool expected = reader.GetBoolean(1);
+
+                    char c = symbol[0];   
+                    bool actual = AnalaizerClass.IsDelimeter(c);
+
+                    Assert.AreEqual(expected, actual);
+                }
+            }
+        }
     }
 }
