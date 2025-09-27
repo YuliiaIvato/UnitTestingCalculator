@@ -4,7 +4,6 @@ using System;
 using System.Data.SqlClient;
 using System.Configuration;
 
-
 namespace UnitTestProject1
 {
     //[TestClass]
@@ -65,34 +64,11 @@ namespace UnitTestProject1
 
     [TestClass]
     public class AnalizerClassTest
-    {
-        private readonly string _connectionString = ConfigurationManager.ConnectionStrings["CalculatorDB"].ConnectionString;
-
-        [TestMethod]
-        public void IsOperatorTest()
-        {
-            using (SqlConnection conn = new SqlConnection(_connectionString))
-            {
-                conn.Open();
-                SqlCommand cmd = new SqlCommand("SELECT Symbol, Expected FROM Operators", conn);
-                SqlDataReader reader = cmd.ExecuteReader();
-
-                while (reader.Read())
-                {
-                    string symbol = reader.GetString(0);      // беремо першу kолонkу 
-                    bool expected = reader.GetBoolean(1);     // беремо другу kолонkу, 0 -> false, 1 -> true
-
-                    bool actual = AnalaizerClass.IsOperator(symbol);
-
-                    Assert.AreEqual(expected, actual);
-                }
-            }
-        }
-
+    { 
         [TestMethod]
         public void IsDelimiterTest()
         {
-            using (SqlConnection conn = new SqlConnection(_connectionString))
+            using (SqlConnection conn = new SqlConnection(@"Data Source=WIN-R2HTMOFGAGL;Database=Calculator;Integrated Security=True"))
             {
                 conn.Open();
                 SqlCommand cmd = new SqlCommand("SELECT Symbol, Expected FROM Delimiters", conn);
@@ -100,15 +76,43 @@ namespace UnitTestProject1
 
                 while (reader.Read())
                 {
-                    string symbol = reader.GetString(0);
+                    //Arrange
+                    string symbol = reader.GetString(0); 
                     bool expected = reader.GetBoolean(1);
 
+                    //Actual
                     char c = symbol[0];   
                     bool actual = AnalaizerClass.IsDelimeter(c);
 
+                    //Assert
                     Assert.AreEqual(expected, actual);
                 }
             }
         }
+
+        [TestMethod]
+        public void IsOperatorTest()
+        {
+            using (SqlConnection conn = new SqlConnection(@"Data Source=WIN-R2HTMOFGAGL;Database=Calculator;Integrated Security=True"))
+            {
+                conn.Open();
+                SqlCommand cmd = new SqlCommand("SELECT Symbol, Expected FROM Operators", conn);
+                SqlDataReader reader = cmd.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    //Arrange
+                    string symbol = reader.GetString(0).Trim();     
+                    bool expected = reader.GetBoolean(1);
+
+                    //Actual
+                    bool actual = AnalaizerClass.IsOperator(symbol);
+
+                    //Assert
+                    Assert.AreEqual(expected, actual);
+                }
+            }
+        }
+
     }
 }
